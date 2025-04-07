@@ -374,7 +374,7 @@ class MathGameGUI:
             # Use after to delay moving to next question slightly so user sees "Correct!"
             self.master.after(400, self.display_question) # Reduced delay slightly
         else:
-            self.status_label.config(text=f"Incorrect. The answer was {self.current_correct_answer}", foreground="red")
+            self.status_label.config(text=f"Incorrect. Please try again", foreground="red")
             self.answer_entry.delete(0, tk.END) # Clear wrong answer
             # Maybe add a small delay before they can try again or move to next? Optional.
             # For now, let them try the same question again immediately.
