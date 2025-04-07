@@ -24,6 +24,7 @@ class MathGameGUI:
         self.style.configure("Header.TLabel", font=("Arial", 18, "bold"))
         self.style.configure("Question.TLabel", font=("Arial", 24, "bold"))
         self.style.configure("Score.TLabel", font=("Arial", 12, "italic"))
+        self.style.configure("Start.TButton", font=("Arial", 16, "bold"))
 
         # --- Game State Variables ---
         self.questions = []
@@ -31,6 +32,7 @@ class MathGameGUI:
         self.start_time = 0
         self.final_time = 0
         self.current_correct_answer = 0
+        self.game_in_progress = False
 
         # --- GUI Widgets ---
         self.header_label = ttk.Label(master, text="Quick Math Challenge!", style="Header.TLabel")
@@ -56,12 +58,16 @@ class MathGameGUI:
         self.leaderboard_display = tk.Text(master, height=11, width=35, font=("Courier", 10), state=tk.DISABLED, wrap=tk.WORD, borderwidth=1, relief="solid")
         self.leaderboard_display.pack(pady=10)
 
-        self.play_again_button = ttk.Button(master, text="Play Again", command=self.start_game, state=tk.DISABLED)
+        # Add Start Button
+        self.start_button = ttk.Button(master, text="Start Game", command=self.start_game, style="Start.TButton", width=15)
+        self.start_button.pack(pady=10)
+
+        self.play_again_button = ttk.Button(master, text="Play Again", command=self.setup_game, state=tk.DISABLED)
         self.play_again_button.pack(pady=5)
 
         # --- Initial Setup ---
         self.load_leaderboard_display() # Show leaderboard initially
-        self.start_game()
+        self.setup_game(show_welcome=True) # Setup the game but don't start the timer
 
     def generate_questions(self):
         """Generates a list of NUM_QUESTIONS problems."""
@@ -95,25 +101,49 @@ class MathGameGUI:
         else:
             self.end_game()
 
-    def start_game(self):
-        """Resets the game state and starts a new game."""
+    def setup_game(self, show_welcome=False):
+        """Sets up the game state but doesn't start the timer."""
         self.generate_questions()
         self.current_question_index = 0
         self.final_time = 0
+        self.game_in_progress = False
+        
+        # Enable/disable appropriate widgets
+        self.answer_entry.config(state=tk.DISABLED)
+        self.submit_button.config(state=tk.DISABLED)
+        self.play_again_button.config(state=tk.DISABLED)
+        self.start_button.config(state=tk.NORMAL)
+        
+        # Clear display
+        self.status_label.config(text="")
+        
+        if show_welcome:
+            self.question_label.config(text="Ready to play?")
+            self.score_label.config(text="Click 'Start Game' when ready!")
+        else:
+            self.question_label.config(text="Play again?")
+            self.score_label.config(text="Click 'Start Game' when ready!")
+
+    def start_game(self):
+        """Starts the game and timer."""
+        self.game_in_progress = True
+        self.start_button.config(state=tk.DISABLED)  # Disable start button during gameplay
         self.answer_entry.config(state=tk.NORMAL)
         self.submit_button.config(state=tk.NORMAL)
-        self.play_again_button.config(state=tk.DISABLED)
-        self.status_label.config(text="")
-        self.score_label.config(text="")
         self.display_question()
-        self.start_time = time.time() # Start timer when first question is displayed
+        self.start_time = time.time()  # Start timer only when the game actually starts
+        self.answer_entry.focus_set()  # Set focus to entry field
 
     def check_answer_event(self, event):
         """Callback for the Enter key press."""
-        self.check_answer()
+        if self.game_in_progress:
+            self.check_answer()
 
     def check_answer(self):
         """Checks the user's answer against the correct answer."""
+        if not self.game_in_progress:
+            return
+            
         try:
             user_answer = int(self.answer_entry.get())
         except ValueError:
@@ -129,9 +159,9 @@ class MathGameGUI:
             self.status_label.config(text="Incorrect. Try again.", foreground="red")
             self.answer_entry.delete(0, tk.END) # Clear wrong answer
 
-
     def end_game(self):
         """Ends the game, calculates score, and handles leaderboard."""
+        self.game_in_progress = False
         self.final_time = time.time() - self.start_time
         self.question_label.config(text="Finished!")
         self.score_label.config(text=f"Your time: {self.final_time:.2f} seconds")
@@ -139,12 +169,12 @@ class MathGameGUI:
         self.answer_entry.config(state=tk.DISABLED)
         self.submit_button.config(state=tk.DISABLED)
         self.play_again_button.config(state=tk.NORMAL)
+        self.start_button.config(state=tk.NORMAL)  # Enable start button for new game
         self.status_label.config(text="")
 
         # Ask for name and update leaderboard
         self.update_leaderboard()
         self.load_leaderboard_display() # Refresh display
-
 
     def load_leaderboard(self):
         """Loads leaderboard data from the JSON file."""
@@ -187,7 +217,6 @@ class MathGameGUI:
              # Keep only top scores
              leaderboard = leaderboard[:LEADERBOARD_SIZE]
              self.save_leaderboard(leaderboard)
-
 
     def load_leaderboard_display(self):
         """Loads and displays the leaderboard in the Text widget."""
