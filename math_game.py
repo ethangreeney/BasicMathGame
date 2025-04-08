@@ -322,7 +322,7 @@ class MathGameGUI:
 
         if show_welcome:
             self.question_label.config(text="Ready?")
-            self.score_label.config(text="Configure options and click 'Start Game'!")
+            self.score_label.config(text="Configure options and press enter to start!")
         else:
             # This case happens when 'Play Again' was clicked
             self.question_label.config(text="Configure & Start!")
