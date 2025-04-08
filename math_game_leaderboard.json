@@ -1,6 +1,11 @@
 [
     {
         "name": "Ethan",
+        "score": 30.450789213180542,
+        "settings": "2op 2dig +-"
+    },
+    {
+        "name": "Ethan",
         "score": 31.970539808273315,
         "settings": "2op 2dig +-"
     },
@@ -31,22 +36,17 @@
     },
     {
         "name": "Ethan",
-        "score": 41.27846598625183,
+        "score": 39.28280830383301,
         "settings": "2op 2dig +-"
     },
     {
         "name": "Ethan",
-        "score": 41.555185079574585,
+        "score": 39.288965940475464,
         "settings": "2op 2dig +-"
     },
     {
         "name": "Ethan",
-        "score": 41.65006494522095,
-        "settings": "2op 2dig +-"
-    },
-    {
-        "name": "Ethan",
-        "score": 44.89253497123718,
+        "score": 39.801461696624756,
         "settings": "2op 2dig +-"
     }
 ]
