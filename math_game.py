@@ -86,6 +86,19 @@ class MathGameGUI:
         # --- Initial Setup ---
         self.load_leaderboard_display() # Show leaderboard initially
         self.setup_game(show_welcome=True) # Setup the initial screen
+        
+        # --- Bind Enter key to start/restart game ---
+        self.master.bind("<Return>", self.start_game_event)
+
+    def start_game_event(self, event):
+        """Event handler for pressing Enter key to start/restart game."""
+        # Only trigger if game is not in progress and start button is enabled
+        if not self.game_in_progress and str(self.start_button['state']) == 'normal':
+            # Check which command is currently assigned to the start button
+            if self.start_button['text'] == "Start Game":
+                self.start_game()
+            else:  # "Play Again"
+                self.setup_game()
 
     def setup_options_frame(self):
         """Set up the options frame with game settings."""
